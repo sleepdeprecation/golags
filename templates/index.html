@@ -10,7 +10,10 @@
   <ul>
   {{range .Posts}}
     <li>
-      <h3>{{.Title}}</h3>
+      <h3><a href="/post/{{.Slug}}">{{.Title}}</a></h3>
+      <p><strong>{{.Timestamp}}</strong></p>
+      
+      <p>{{.Frontmatter}}</p>
       <p>{{.Content}}<p>
     </li>
   {{end}}

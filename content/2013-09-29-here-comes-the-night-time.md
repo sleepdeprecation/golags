@@ -1,5 +1,5 @@
 ---
-title: "Here Comes the Night Time"
+title: Here Comes the Night Time
 layout: post
 date: 2013-09-29
 ---

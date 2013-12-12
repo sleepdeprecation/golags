@@ -3,60 +3,49 @@ package main
 import (
   "github.com/codegangsta/martini"
   "html/template"
-  "math/rand"
   "net/http"
-  "time"
-  "strconv"
+  "./golag"
+  "fmt"
 )
 
-type Post struct {
-  Title     string
-  Timestamp time.Time
-  Content   template.HTML
-}
-
-type Site struct {
-  Title string
-  Posts []Post
-}
-
-var site Site
+var site *golag.Site
 
 func main() {
-  site = Site{
+  site = &golag.Site{
     Title: "Test Golag",
-    Posts: make([]Post, 0),
+    Posts: make([]*golag.Post, 0),
+    Config: make(map[string]string),
   }
-  makeFakePosts()
+
+  site.Config["postDir"] = "content"
+
+  posts, err := site.ReadPostDirectory() 
+  if err != nil {
+    fmt.Println("Couldn't read post directory")
+    fmt.Println(err)
+  }
+  site.Posts = posts
 
   m := martini.Classic()
   m.Get("/", index)
+  m.Get("/post/:slug", post)
 
   m.Run()
 }
 
 func index(w http.ResponseWriter) {
-  /*temp := Post{
-    Title:     "Test",
-    Timestamp: time.Now(),
-    Content:   "<p>Hello <em>World</em>!</p>",
-  }*/
-
   templ, _ := template.ParseFiles("templates/index.html")
   templ.Execute(w, site)
 }
 
-func makeFakePosts() {
-  rand.Seed(time.Now().Unix())
-  numPosts := rand.Intn(13) + 2
-
-  for i := 1; i <= numPosts; i++ {
-    p := Post{
-      Title:     "Post " + strconv.Itoa(i),
-      Timestamp: time.Now(),
-      Content:   template.HTML("Content in <code>post #" + strconv.Itoa(i) + "</code>"),
-    }
-
-    site.Posts = append(site.Posts, p)
+func post(params martini.Params, w http.ResponseWriter) {
+  post := site.FindPost(params["slug"])
+  if post == nil {
+    // TODO: make 404 better
+    fmt.Fprintf(w, "No post found")
+    return
   }
+
+  templ, _ := template.ParseFiles("templates/post.html")
+  templ.Execute(w, post)
 }
