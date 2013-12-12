@@ -2,6 +2,8 @@ package golag
 
 import (
   "io/ioutil"
+  "github.com/howeyc/fsnotify"
+  "log"
 )
 
 type Site struct {
@@ -38,4 +40,40 @@ func (s *Site) FindPost(slug string) (*Post) {
   }
 
   return nil
+}
+
+func (s *Site) WatchChanges() {
+  watcher, err := fsnotify.NewWatcher()
+  if err != nil {
+    log.Println("Couldn't make an fswatcher", err)
+    return
+  }
+
+  done := make(chan bool)
+
+  go func() {
+    for {
+      select {
+      case ev := <- watcher.Event:
+        posts, err := s.ReadPostDirectory()
+        if err != nil {
+          log.Println("Couldn't refresh posts")
+          continue
+        }
+
+        s.Posts = posts
+      case err := <- watcher.Error:
+        continue
+      }
+    }
+  }()
+
+  err = watcher.Watch(s.Config["postDir"])
+  if err != nil {
+    log.Println("Couldn't watch postDir", err)
+    return
+  }
+
+  <- done
+  watcher.Close()
 }

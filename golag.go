@@ -26,6 +26,8 @@ func main() {
   }
   site.Posts = posts
 
+  go site.WatchChanges()
+
   m := martini.Classic()
   m.Get("/", index)
   m.Get("/post/:slug", post)
