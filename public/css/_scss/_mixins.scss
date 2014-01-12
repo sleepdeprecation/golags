@@ -1,0 +1,43 @@
+// collection of mixins...
+
+@mixin border-radius($rad) {
+  -webkit-border-radius:$rad;
+  -moz-border-radius:$rad;
+  -o-border-radius:$rad;
+  border-radius:$rad;
+}
+
+@mixin iebox {
+  -moz-box-sizing:border-box;
+  box-sizing:border-box;
+}
+
+@mixin transition($property) {
+  -webkit-transition-property:$property;
+  -webkit-transition-duration:2s;
+  -o-transition-property:$property;
+  -o-transition-duration:2s;
+  transition-property:$property;
+  transition-duration:2s;
+}
+
+@mixin transition($property, $duration) {
+  -webkit-transition-property:$property;
+  -webkit-transition-duration:$duration;
+  -o-transition-property:$property;
+  -o-transition-duration:$duration;
+  transition-property:$property;
+  transition-duration:$duration;
+}
+
+@mixin columns($numCols) {
+  -webkit-column-count:$numCols;
+  -moz-column-count:$numCols;
+  -o-column-count:$numCols;
+  column-count:$numCols;
+
+  -webkit-column-gap:50px;
+  -moz-column-gap:50px;
+  -o-column-gap:50px;
+  column-gap:50px;
+}

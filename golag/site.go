@@ -4,12 +4,18 @@ import (
   "io/ioutil"
   "github.com/howeyc/fsnotify"
   "log"
+  "sort"
+  "html/template"
+  "path/filepath"
 )
 
 type Site struct {
   Title string
   Posts []*Post
   Config map[string]string
+  PostTemplate *template.Template
+  IndexTemplate *template.Template
+  Templates *template.Template
 }
 
 func (s *Site) ReadPostDirectory() ([]*Post, error) {
@@ -29,7 +35,32 @@ func (s *Site) ReadPostDirectory() ([]*Post, error) {
     posts = append(posts, post)
   }
 
+  sort.Sort(sort.Reverse(sortablePost(posts)))
   return posts, nil
+}
+
+func (s *Site) ReadTemplatesDirectory() (*template.Template, error) {
+  fis, err := ioutil.ReadDir(s.Config["templateDir"])
+  if err != nil {
+    return nil, newError("Couldn't read templates directory", err)
+  }
+  
+  files := make([]string, 0)
+  for _, fi := range fis {
+    files = append(files, filepath.Join(s.Config["templateDir"], fi.Name()))
+
+    if err != nil {
+      return nil, newError("Couldn't read template `" + fi.Name() + "`", err)
+    }
+  }
+
+  templs, err := template.ParseFiles(files...)
+  if err != nil {
+    log.Println("\n\nError!", err, "\n\n")
+    return nil, err
+  }
+
+  return template.Must(templs, nil), nil
 }
 
 func (s *Site) FindPost(slug string) (*Post) {
@@ -42,7 +73,7 @@ func (s *Site) FindPost(slug string) (*Post) {
   return nil
 }
 
-func (s *Site) WatchChanges() {
+func (s *Site) WatchPostChanges() {
   watcher, err := fsnotify.NewWatcher()
   if err != nil {
     log.Println("Couldn't make an fswatcher", err)
@@ -54,7 +85,7 @@ func (s *Site) WatchChanges() {
   go func() {
     for {
       select {
-      case ev := <- watcher.Event:
+      case <- watcher.Event:
         posts, err := s.ReadPostDirectory()
         if err != nil {
           log.Println("Couldn't refresh posts")
@@ -62,7 +93,7 @@ func (s *Site) WatchChanges() {
         }
 
         s.Posts = posts
-      case err := <- watcher.Error:
+      case <- watcher.Error:
         continue
       }
     }
@@ -77,3 +108,8 @@ func (s *Site) WatchChanges() {
   <- done
   watcher.Close()
 }
+
+type sortablePost []*Post
+func (s sortablePost) Len() int { return len(s) }
+func (s sortablePost) Less(i, j int) bool { return s[i].Timestamp.Before(s[j].Timestamp) }
+func (s sortablePost) Swap(i, j int) { s[i], s[j] = s[j], s[i] }

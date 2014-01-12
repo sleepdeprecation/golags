@@ -16,13 +16,12 @@ import (
 
 type Post struct {
   Title     string
-  Timestamp time.Time
+  Timestamp timestamp
   Content   template.HTML
   Frontmatter map[string]string
   Slug string
+  Site *Site
 }
-
-
 
 func ReadPost(fileInfo os.FileInfo, s *Site) (*Post, error) {
   file, err := os.Open(filepath.Join(s.Config["postDir"], fileInfo.Name()))
@@ -37,11 +36,7 @@ func ReadPost(fileInfo os.FileInfo, s *Site) (*Post, error) {
     return nil, newError("Error reading frontmatter of `" + fileInfo.Name() + "`", err)
   }
 
-  slug := getSlug(fileInfo.Name())
-  //pubTime, err := time.Parse("2013-Jan-30", frontmatter["date"])
-  //if err != nil {
-  //  pubTime = fileInfo.ModTime()
-  //}
+  slug := getSlug(fileInfo.Name()) + ".html"
 
   pubTime := fileInfo.ModTime()
   timeSplit := strings.Split(frontmatter["date"], "-")
@@ -69,10 +64,11 @@ func ReadPost(fileInfo os.FileInfo, s *Site) (*Post, error) {
   content := blackfriday.MarkdownCommon(buffer.Bytes())
   post := &Post{
     Title: frontmatter["title"],
-    Timestamp: pubTime,
+    Timestamp: timestamp(pubTime),
     Content: template.HTML(content),
     Frontmatter: frontmatter,
     Slug: slug,
+    Site: s,
   }
 
   return post, nil
@@ -112,4 +108,16 @@ func readFrontmatter(s *bufio.Scanner) (map[string]string, error) {
 var slugRegex = regexp.MustCompile(`[^a-zA-Z\-0-9]`)
 func getSlug(filename string) string {
   return slugRegex.ReplaceAllString(strings.Replace(filename, filepath.Ext(filename), "", 1), "-")
+}
+
+
+type timestamp time.Time
+func (t timestamp) SimpleDate() string {
+  return time.Time(t).Format("01 Jan 2006")
+}
+func (t timestamp) Before(u timestamp) bool {
+  return time.Time(t).Before(time.Time(u))
+}
+func (t timestamp) String() string {
+  return time.Time(t).String()
 }

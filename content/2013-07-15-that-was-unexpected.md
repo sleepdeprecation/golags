@@ -1,5 +1,5 @@
 ---
-title: "That was unexpected"
+title: That was unexpected
 layout: post
 published: true
 date: 2013-07-15

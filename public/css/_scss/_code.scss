@@ -1,0 +1,63 @@
+code, .code, .code pre {  
+  font-size: $codesize;
+  line-height: 1.5em;
+  font-family: $mono;
+  font-weight: 400;
+
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    font-size: $codesize * 1.5;
+  }
+}
+
+pre {
+  background: rgb(35, 39, 43); color: #f8f8f2;
+  padding: 1em 1.5em;
+  overflow-x: scroll;
+  line-height: 1.5em;
+
+  @include iebox;
+
+  code {
+    padding: 0;
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  &::-webkit-scrollbar-track {
+      background-color: rgba(215,205,205,.5);
+  }   
+  &::-webkit-scrollbar-thumb {
+      background: rgba(215,205,205,1); 
+  }
+  &::-webkit-scrollbar-thumb:window-inactive {
+    background: rgba(215,205,205,0.7); 
+  }
+}
+
+/*div.code {
+  @media (min-width: 1200px) {
+    width: 1100px;
+    margin-left: -150px;
+  }
+}*/
+
+.highlighttable {
+  display: block;
+  width: 100%;
+
+  overflow-x: scroll;
+  margin-bottom: 1em;
+
+  td { padding: 0; }
+  pre { padding: .5em 1em; margin: 0; overflow: hidden; }
+  .code { width: 100%; }
+  
+  .linenos { 
+    pre { color: #839496;}
+    border-right: 1px solid #839496;
+  }
+}
+

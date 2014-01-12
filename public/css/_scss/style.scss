@@ -1,0 +1,43 @@
+// colors
+$white:         hsl(190, 10%, 98.5%);
+
+$main:          hsl(190, 40%, 50%);
+$dark:          hsl(190, 40%, 30%);
+$darker:        hsl(190, 40%, 10%);
+$light:         hsl(190, 40%, 70%);
+$lighter:       hsl(190, 40%, 90%);
+
+$extralight:    hsl(190, 40%, 93%);
+$el-highlight:  hsl(190, 40%, 80%);
+
+$border:        hsl(190, 10%, 87%);
+
+$footer:        hsl(190, 10%, 8%);
+
+$text:          hsl(190, 10%, 30%);
+$links:         hsl(190, 10%, 10%);
+
+$text-footer:   hsl(190, 10%, 70%);
+$links-footer:  hsl(190, 10%, 90%);
+
+
+$fontsize:      21px;
+$lineheight:    1.7em;
+$bottompad:     1.25em;
+$codesize:      18px;
+
+$small:         .8em;
+
+
+$sans: "Source Sans Pro", sans-serif;
+$serif: 'Gentium Basic', "Droid Serif", serif;
+$mono: "Source Code Pro", "Cousine", monospace;
+
+@import 'http://fonts.googleapis.com/css?family=Gentium+Basic:400,400italic,700,700italic|Source+Code+Pro:400,700|Source+Sans+Pro:900,700,400';
+
+@import 'mixins';
+@import 'generics';
+@import 'code';
+
+@import 'main';
+@import 'posts';

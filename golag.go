@@ -2,22 +2,25 @@ package main
 
 import (
   "github.com/codegangsta/martini"
-  "html/template"
+  //"html/template"
   "net/http"
   "./golag"
   "fmt"
+  "log"
 )
 
 var site *golag.Site
 
 func main() {
   site = &golag.Site{
-    Title: "Test Golag",
+    Title: "Words, words, words",
     Posts: make([]*golag.Post, 0),
     Config: make(map[string]string),
   }
 
   site.Config["postDir"] = "content"
+  site.Config["templateDir"] = "templates"
+  site.Config["root"] = "/"
 
   posts, err := site.ReadPostDirectory() 
   if err != nil {
@@ -25,19 +28,25 @@ func main() {
     fmt.Println(err)
   }
   site.Posts = posts
+  templs, err := site.ReadTemplatesDirectory()
+  if err != nil {
+    log.Fatal(err)
+  }
+  site.Templates = templs
 
-  go site.WatchChanges()
+  go site.WatchPostChanges()
 
   m := martini.Classic()
   m.Get("/", index)
   m.Get("/post/:slug", post)
-
   m.Run()
 }
 
 func index(w http.ResponseWriter) {
-  templ, _ := template.ParseFiles("templates/index.html")
-  templ.Execute(w, site)
+  err := site.Templates.ExecuteTemplate(w, "index.html", golag.GetPage(site, nil))
+  if err != nil {
+    log.Fatal("\n\nError!\n", err)
+  }
 }
 
 func post(params martini.Params, w http.ResponseWriter) {
@@ -48,6 +57,8 @@ func post(params martini.Params, w http.ResponseWriter) {
     return
   }
 
-  templ, _ := template.ParseFiles("templates/post.html")
-  templ.Execute(w, post)
+  err := site.Templates.ExecuteTemplate(w, "default", golag.GetPage(site, post))
+  if err != nil {
+    log.Println("\n\n\nError!", err)
+  }
 }

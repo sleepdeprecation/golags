@@ -1,13 +1,16 @@
-<!doctype html>
-<html>
-<head>
-  <title>{{.Title}}</title>
-</head>
-<body>
-  <h1>{{.Title}}</h1>
-  <p><strong>{{.Timestamp}}</strong></p>
+{{define "post"}}
+<main class="content" role="main">
+  <article class="single">
+    <header>
+      <h1 class="post-title">{{.Title}}</h1>
+      <span class="post-meta"><time datetime="{{.Timestamp}}">{{.Timestamp.SimpleDate}}</time></span>
+    </header>
 
-  {{.Content}}
+    <section class="post-content">
+      {{.Content}}
+    </section>
+  </article>
+</main>
+{{end}}
 
-</body>
-</html>
+{{template "default.html" .}}
